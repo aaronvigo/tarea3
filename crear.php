@@ -154,6 +154,7 @@
             $pdostmt->execute();
             $array = $pdostmt->fetchAll(PDO::FETCH_ASSOC);
 
+            $pdostmt->closeCursor();
 
             return $array;
         }
@@ -178,6 +179,7 @@
             $stmt->execute();
             $array = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+            $stmt->closeCursor();
             return $array;
         }
 
@@ -205,23 +207,25 @@
             global $title, $isbn, $pdate, $pub_Id, $book_author_ids;
 
             try {
-                $conn->beginTransaction();
+                // $conn->beginTransaction();
 
-                $queryBook = $conn->prepare("INSERT INTO books (title,isbn,published_date,publisher_id) VALUES (?, ?, ?, ?) ");
-                $queryBook->execute([$title, $isbn, $pdate , $pub_Id]);
+                //$queryBook = $conn->prepare("INSERT INTO books (title,isbn,published_date,publisher_id) VALUES (?, ?, ?, ?) ");
+                $queryBook = $conn->query("INSERT INTO books (title) VALUES ('$title') ");
+              
+                //$queryBook->execute();
 
-                $lastBookId = $conn->lastInsertId();
+                // $lastBookId = $conn->lastInsertId();
 
-                if ($book_author_ids !== null) {
-                    foreach ($book_author_ids as $authorId) {
-                        $queryBookAuthor = $conn->prepare("INSERT INTO book_authors (book_id, author_id) VALUES (?, ?)");
-                        $queryBookAuthor->execute([$lastBookId, $authorId]);
-                    }
-                }
+                // if ($book_author_ids !== null) {
+                //     foreach ($book_author_ids as $authorId) {
+                //         $queryBookAuthor = $conn->prepare("INSERT INTO book_authors (book_id, author_id) VALUES (?, ?)");
+                //         $queryBookAuthor->execute([$lastBookId, $authorId]);
+                //     }
+                // }
 
-                $conn->commit();
+        
             } catch (PDOException $e) {
-                $conn->rollBack();
+               // $conn->rollBack();
                 echo "Error al introducir los datos en la BD:\n" . $e->getMessage();
             }
         }
